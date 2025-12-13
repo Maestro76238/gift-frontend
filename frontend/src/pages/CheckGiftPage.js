@@ -55,9 +55,16 @@ function CheckGiftPage() {
     setOpening(true);
 
     // 🎬 анимация распаковки → затем скачивание
-    setTimeout(() => {
-      downloadGift(giftUrl);
-    }, 1200);
+    setTimeout(async () => {
+  await downloadGift(giftUrl);
+
+  // 🔒 помечаем код использованным
+  await fetch(
+    `${process.env.REACT_APP_API_URL}/api/use-gift/${code}`,
+    { method: "POST" }
+  );
+}, 1200);
+
   };
 
   return (
