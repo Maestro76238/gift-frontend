@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { getGift } from "../api";
 import "./CheckGiftPage.css";
 
-// ✅ ГАРАНТИРОВАННОЕ СКАЧИВАНИЕ
+// 🔽 гарантированное скачивание файла
 const downloadGift = async (url) => {
   const res = await fetch(url);
   const blob = await res.blob();
@@ -23,17 +23,20 @@ function CheckGiftPage() {
   const [giftUrl, setGiftUrl] = useState(null);
   const [message, setMessage] = useState("");
   const [opening, setOpening] = useState(false);
+  const [checking, setChecking] = useState(false);
 
   const handleCheck = async () => {
+    if (checking) return;
+
+    setChecking(true);
     setMessage("");
     setGiftUrl(null);
     setOpening(false);
 
     try {
-      const res = await getGift(code);
+      const res = await getGift(code.trim().toUpperCase());
 
-      // ✅ ТОЛЬКО если реально пришёл URL
-      if (res?.gift_url) {
+      if (res && res.gift_url) {
         setGiftUrl(res.gift_url);
         setMessage("🎉 Код верный! Нажмите на подарок 🎁");
       } else {
@@ -41,15 +44,17 @@ function CheckGiftPage() {
       }
     } catch (err) {
       setMessage("❌ Неверный или уже использованный код");
+    } finally {
+      setChecking(false);
     }
   };
 
-  const handleGiftClick = async () => {
+  const handleGiftClick = () => {
     if (!giftUrl || opening) return;
 
     setOpening(true);
 
-    // 🎬 даём проиграться анимации
+    // 🎬 анимация распаковки → затем скачивание
     setTimeout(() => {
       downloadGift(giftUrl);
     }, 1200);
@@ -58,7 +63,7 @@ function CheckGiftPage() {
   return (
     <div className="check-page">
       <motion.div
-        className="gift"
+        className={`gift ${giftUrl ? "active" : ""}`}
         onClick={handleGiftClick}
         animate={
           giftUrl
@@ -89,9 +94,11 @@ function CheckGiftPage() {
           <input
             placeholder="Введите секретный код"
             value={code}
-            onChange={(e) => setCode(e.target.value)}
+            onChange={(e) => setCode(e.target.value.toUpperCase())}
           />
-          <button onClick={handleCheck}>Проверить код</button>
+          <button onClick={handleCheck} disabled={checking}>
+            {checking ? "Проверка..." : "Проверить код"}
+          </button>
         </div>
       )}
 

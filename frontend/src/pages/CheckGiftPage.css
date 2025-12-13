@@ -8,121 +8,63 @@
   color: white;
 }
 
-/* =======================
-   ПОДАРОК
-======================= */
-
+/* 🎁 подарок */
 .gift {
-  font-size: 160px;
+  font-size: 150px;
+  background: none;
+  border: none;
   cursor: default;
   user-select: none;
-  line-height: 1;
-  background: none;
-  box-shadow: none;
-  border: none;
 }
 
 .gift.active {
   cursor: pointer;
 }
 
-.gift.opened {
-  transform: scale(0.85);
-  opacity: 0.7;
+/* ❌ убираем любые фоны / квадраты */
+.gift,
+.gift * {
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
-/* ❌ НЕТ КВАДРАТОВ */
-.gift::before,
-.gift::after {
-  display: none !important;
-}
-
-/* =======================
-   ПОЛЕ ВВОДА
-======================= */
-
+/* поле ввода */
 .code-box {
   margin-top: 30px;
   display: flex;
-  gap: 12px;
+  gap: 10px;
 }
 
 .code-box input {
   padding: 12px 16px;
   font-size: 18px;
-  border-radius: 10px;
+  border-radius: 8px;
   border: none;
   outline: none;
 }
 
 .code-box button {
-  padding: 12px 22px;
+  padding: 12px 20px;
   font-size: 18px;
-  border-radius: 10px;
+  border-radius: 8px;
   border: none;
-  background: linear-gradient(135deg, gold, orange);
+  background: gold;
   cursor: pointer;
   font-weight: bold;
 }
 
-.code-box button:hover {
-  filter: brightness(1.1);
+.code-box button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-/* =======================
-   СООБЩЕНИЕ
-======================= */
+.code-box button:hover:not(:disabled) {
+  background: orange;
+}
 
+/* подсказка */
 .hint {
   margin-top: 25px;
   font-size: 22px;
   text-align: center;
-}
-/* =========================
-   MOBILE ADAPTATION
-========================= */
-
-@media (max-width: 768px) {
-  .check-page {
-    padding: 20px;
-    justify-content: center;
-  }
-
-  .gift {
-    font-size: 120px;
-    line-height: 1;
-  }
-
-  .code-box {
-    flex-direction: column;
-    width: 100%;
-    max-width: 320px;
-    gap: 12px;
-  }
-
-  .code-box input {
-    width: 100%;
-    font-size: 16px;
-  }
-
-  .code-box button {
-    width: 100%;
-    font-size: 16px;
-  }
-
-  .hint {
-    font-size: 18px;
-    text-align: center;
-    max-width: 90%;
-  }
-}
-
-@media (max-width: 480px) {
-  .gift {
-    font-size: 100px;
-  }
-
-  .hint {
-    font-size: 16px;
-  }
 }
