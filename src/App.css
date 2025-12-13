@@ -1,0 +1,30 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(180deg, #0b1d3a, #122b5f);
+  overflow-x: hidden;
+}
+
+
+
+.home {
+  height: 100vh;
+  background: linear-gradient(#00111a, #003);
+  color: white;
+  text-align: center;
+  overflow: hidden;
+}
+
+.tree {
+  font-size: 120px;
+  margin-top: 120px;
+}
+
+.gifts {
+  margin-top: 50px;
+}
+
+.gift {
+  font-size: 80px;
+  cursor: pointer;
+}
