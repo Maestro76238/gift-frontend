@@ -26,7 +26,7 @@ function CheckGiftPage() {
   const [checking, setChecking] = useState(false);
 
   const handleCheck = async () => {
-    if (checking) return;
+    if (checking || !code.trim()) return;
 
     setChecking(true);
     setMessage("");
@@ -36,35 +36,27 @@ function CheckGiftPage() {
     try {
       const res = await getGift(code.trim().toUpperCase());
 
-      if (res && res.gift_url) {
+      if (res?.gift_url) {
         setGiftUrl(res.gift_url);
         setMessage("🎉 Код верный! Нажмите на подарок 🎁");
       } else {
-        setMessage("❌ Код уже использован");
+        setMessage("❌ Неверный или уже использованный код");
       }
-    } catch (err) {
+    } catch (e) {
       setMessage("❌ Неверный или уже использованный код");
     } finally {
       setChecking(false);
     }
   };
 
-  const handleGiftClick = () => {
+  const handleGiftClick = async () => {
     if (!giftUrl || opening) return;
 
     setOpening(true);
 
-    // 🎬 анимация распаковки → затем скачивание
     setTimeout(async () => {
-  await downloadGift(giftUrl);
-
-  // 🔒 помечаем код использованным
-  await fetch(
-    `${process.env.REACT_APP_API_URL}/api/use-gift/${code}`,
-    { method: "POST" }
-  );
-}, 1200);
-
+      await downloadGift(giftUrl);
+    }, 1200);
   };
 
   return (
@@ -80,9 +72,7 @@ function CheckGiftPage() {
                   rotate: [0, 10, -10, 0],
                   opacity: [1, 1, 0],
                 }
-              : {
-                  scale: [1, 1.08, 1],
-                }
+              : { scale: [1, 1.08, 1] }
             : {}
         }
         transition={

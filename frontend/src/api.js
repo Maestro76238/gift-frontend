@@ -1,18 +1,13 @@
 const API_URL = "https://gift-backend-tn9w.onrender.com";
 
-export async function createGift(file) {
-  const formData = new FormData();
-  formData.append("file", file);
-
-  const res = await fetch(`${API_URL}/api/create-gift`, {
-    method: "POST",
-    body: formData,
+export async function getGift(code) {
+  const res = await fetch(`${API_URL}/api/get-gift/${code}`, {
+    method: "GET",
   });
 
-  return res.json();
-}
+  if (!res.ok) {
+    throw new Error("Invalid or used code");
+  }
 
-export async function getGift(code) {
-  const res = await fetch(`${API_URL}/api/get-gift/${code}`);
-  return res.json();
+  return await res.json();
 }
