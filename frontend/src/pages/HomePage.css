@@ -309,7 +309,7 @@ body::after {
 
 .header-text h1 {
   font-size: 48px;
-  color: white;
+  color: golden;
   text-shadow: 0 0 20px rgba(255,255,255,0.6);
 }
 
