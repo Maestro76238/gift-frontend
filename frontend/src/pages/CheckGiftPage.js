@@ -62,6 +62,7 @@ function CheckGiftPage() {
         { method: "POST" }
       );
      }, 1200);
+   };
 
   return (
     <div className="check-page">
