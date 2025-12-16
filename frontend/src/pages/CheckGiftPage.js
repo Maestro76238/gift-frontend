@@ -59,7 +59,7 @@ const handleGiftClick = async () => {
       await downloadGift(giftUrl);
 
       await fetch(
-        ${process.env.REACT_APP_API_URL}/api/use-gift/${code},
+        `${process.env.REACT_APP_API_URL}/api/use-gift/${code}`,
         {
           method: "POST",
         }
