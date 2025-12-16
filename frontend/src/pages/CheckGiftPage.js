@@ -3,20 +3,6 @@ import { motion } from "framer-motion";
 import { getGift } from "../api";
 import "./CheckGiftPage.css";
 
-// 🔽 гарантированное скачивание файла
-const downloadGift = async (url) => {
-  const res = await fetch(url);
-  const blob = await res.blob();
-
-  const blobUrl = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = blobUrl;
-  a.download = "gift";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(blobUrl);
-};
 
 function CheckGiftPage() {
    const [code, setCode] = useState("");    
@@ -56,21 +42,15 @@ const handleGiftClick = async () => {
 
   setOpening(true);
 
-  setTimeout(async () => {
-    try {
-      await downloadGift(giftUrl);
+  // ✅ 1. СНАЧАЛА помечаем код использованным
+  await fetch(
+    ${process.env.REACT_APP_API_URL}/api/use-gift/${code},
+    { method: "POST" }
+  );
 
-      await fetch(
-        `${process.env.REACT_APP_API_URL}/api/use-gift/${usedCode}`,
-        {
-          method: "POST",
-        }
-      );
-
-      console.log("POST use-gift отправлен", usedCode);
-    } catch (e) {
-      console.error("Ошибка use-gift:", e);
-    }
+  // ✅ 2. Потом просто открываем файл
+  setTimeout(() => {
+    window.location.href = giftUrl;
   }, 1200);
 };
 
