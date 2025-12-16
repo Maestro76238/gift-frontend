@@ -44,7 +44,7 @@ const handleGiftClick = async () => {
 
   // ✅ 1. СНАЧАЛА помечаем код использованным
   await fetch(
-    ${process.env.REACT_APP_API_URL}/api/use-gift/${code},
+    `${process.env.REACT_APP_API_URL}/api/use-gift/${code}`,
     { method: "POST" }
   );
 
