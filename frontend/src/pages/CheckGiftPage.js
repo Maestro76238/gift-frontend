@@ -49,24 +49,28 @@ function CheckGiftPage() {
     }
   };
 
-  const handleGiftClick = async () => {
-    if (!giftUrl || opening) return;
+const handleGiftClick = async () => {
+  if (!giftUrl || opening) return;
 
-    setOpening(true);
+  setOpening(true);
 
-    setTimeout(async () => {
-  	console.log("🔥 USE-GIFT FETCH", code, process.env.REACT_APP_API_URL);
+  setTimeout(async () => {
+    try {
+      await downloadGift(giftUrl);
 
-  	await downloadGift(giftUrl);
+      await fetch(
+        ${process.env.REACT_APP_API_URL}/api/use-gift/${code},
+        {
+          method: "POST",
+        }
+      );
 
-  	const r = await fetch(
-    		`${process.env.REACT_APP_API_URL}/api/use-gift/${code}`,
-    	{ method: "POST" }
-  	);
-
-  	console.log("🔥 USE-GIFT RESPONSE", r.status);
-	}, 1200);
-  };
+      console.log("POST /api/use-gift отправлен");
+    } catch (e) {
+      console.error("Ошибка use-gift:", e);
+    }
+  }, 1200);
+};
 
   return (
     <div className="check-page">
