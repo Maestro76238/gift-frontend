@@ -59,7 +59,9 @@ function CheckGiftPage() {
       
       await fetch(
         `${process.env.REACT_APP_API_URL}/api/use-gift/${code}`,
-        { method: "POST" }
+        { method: "POST" }  
+      ).then(() +> console.log("USE-GIFT SENT"));
+
       );
      }, 1200);
    };
