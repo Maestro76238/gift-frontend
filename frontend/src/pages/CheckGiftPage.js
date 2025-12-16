@@ -56,8 +56,12 @@ function CheckGiftPage() {
 
     setTimeout(async () => {
       await downloadGift(giftUrl);
-    }, 1200);
-  };
+      
+      await fetch(
+        `${process.env.REACT_APP_API_URL}/api/use-gift/${code}`,
+        { method: "POST" }
+      );
+     }, 1200);
 
   return (
     <div className="check-page">
