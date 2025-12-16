@@ -55,13 +55,17 @@ function CheckGiftPage() {
     setOpening(true);
 
     setTimeout(async () => {
-      await downloadGift(giftUrl);
+  	console.log("🔥 USE-GIFT FETCH", code, process.env.REACT_APP_API_URL);
 
-      await fetch(
-        `${process.env.REACT_APP_API_URL}/api/use-gift/${code}`,
-        { method: "POST" }
-      );
-    }, 1200);
+  	await downloadGift(giftUrl);
+
+  	const r = await fetch(
+    		${process.env.REACT_APP_API_URL}/api/use-gift/${code},
+    	{ method: "POST" }
+  	);
+
+  	console.log("🔥 USE-GIFT RESPONSE", r.status);
+	}, 1200);
   };
 
   return (
