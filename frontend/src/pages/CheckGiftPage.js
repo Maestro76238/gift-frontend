@@ -23,8 +23,8 @@ function CheckGiftPage() {
     try {
       const res = await getGift(code.trim().toUpperCase());
 
-      if (res?.gift_url) {
-        setGiftUrl(res.gift_url);
+      if (res) {
+        setGiftUrl(res.gift_url || null);
         setUsedCode(code.trim().toUpperCase());
         setMessage("🎉 Код верный! Нажмите на подарок 🎁");
       } else {
