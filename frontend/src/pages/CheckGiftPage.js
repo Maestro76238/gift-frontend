@@ -19,11 +19,12 @@ const downloadGift = async (url) => {
 };
 
 function CheckGiftPage() {
-  const [code, setCode] = useState("");
-  const [giftUrl, setGiftUrl] = useState(null);
-  const [message, setMessage] = useState("");
-  const [opening, setOpening] = useState(false);
-  const [checking, setChecking] = useState(false);
+   const [code, setCode] = useState("");    
+   const [usedCode, setUsedCode] = useState(""); // ← ВАЖНО
+   const [giftUrl, setGiftUrl] = useState(null);
+   const [message, setMessage] = useState("");
+   const [opening, setOpening] = useState(false);
+   const [checking, setChecking] = useState(false);
 
   const handleCheck = async () => {
     if (checking || !code.trim()) return;
@@ -38,6 +39,7 @@ function CheckGiftPage() {
 
       if (res?.gift_url) {
         setGiftUrl(res.gift_url);
+        setUsedCode(code.trim().toUpperCase());
         setMessage("🎉 Код верный! Нажмите на подарок 🎁");
       } else {
         setMessage("❌ Неверный или уже использованный код");
@@ -65,7 +67,7 @@ const handleGiftClick = async () => {
         }
       );
 
-      console.log("POST /api/use-gift отправлен");
+      console.log("POST use-gift отправлен", usedCode);
     } catch (e) {
       console.error("Ошибка use-gift:", e);
     }
