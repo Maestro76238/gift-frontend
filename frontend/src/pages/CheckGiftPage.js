@@ -42,7 +42,7 @@ function CheckGiftPage() {
       } else {
         setMessage("❌ Неверный или уже использованный код");
       }
-    } catch (e) {
+    } catch {
       setMessage("❌ Неверный или уже использованный код");
     } finally {
       setChecking(false);
@@ -56,15 +56,13 @@ function CheckGiftPage() {
 
     setTimeout(async () => {
       await downloadGift(giftUrl);
-      
-      await fetch(
-        `${process.env.REACT_APP_API_URL}/api/use-gift/${code}`,
-        { method: "POST" }  
-      ).then(() +> console.log("USE-GIFT SENT"));
 
+      await fetch(
+        ${process.env.REACT_APP_API_URL}/api/use-gift/${code},
+        { method: "POST" }
       );
-     }, 1200);
-   };
+    }, 1200);
+  };
 
   return (
     <div className="check-page">
