@@ -34,6 +34,7 @@ function CheckGiftPage() {
 
     try {
       const res = await getGift(code.trim().toUpperCase());
+      console.log("FRONT RESPONSE:", res);
 
       if (res?.gift?.file_url) {
         setGift(res.gift);
