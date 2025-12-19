@@ -21,15 +21,14 @@ function CheckGiftPage() {
     setOpening(false);
 
     try {
-      const res = await getGift(code.trim().toUpperCase());
+const res = await getGift(code.trim().toUpperCase());
 
-      if (res) {
-        setGiftUrl(res.gift_url || null);
-        setUsedCode(code.trim().toUpperCase());
-        setMessage("🎉 Код верный! Нажмите на подарок 🎁");
-      } else {
-        setMessage("❌ Неверный или уже использованный код");
-      }
+if (res?.gift?.file_url) {
+  setGiftUrl(res.gift.file_url);
+  setMessage("🎉 Код верный! Нажмите на подарок 🎁");
+} else {
+  setMessage("❌ Неверный или уже использованный код");
+}
     } catch {
       setMessage("❌ Неверный или уже использованный код");
     } finally {
