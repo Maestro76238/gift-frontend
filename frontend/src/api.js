@@ -1,44 +1,23 @@
-const API_URL = "https://gift-backend-tn9w.onrender.com";
+const API_URL = process.env.REACT_APP_API_URL;
 
-/**
- * Проверка кода (перед показом подарка)
- * Используется на сайте при вводе кода
- */
 export async function getGift(code) {
-  const res = await fetch(`${API_URL}/api/check-gift`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ code }),
-  });
+  const res = await fetch(`${API_URL}/api/get-gift/${code}`);
 
-  const data = await res.json();
-
-  if (!res.ok || !data.ok) {
-    throw new Error(data.error || "Неверный или уже использованный код");
+  if (!res.ok) {
+    throw new Error("INVALID_CODE");
   }
 
-  return data;
+  return await res.json();
 }
 
-/**
- * Использование кода (после подтверждения на сайте)
- */
 export async function useGift(code) {
-  const res = await fetch(`${API_URL}/api/use-gift`, {
+  const res = await fetch(`${API_URL}/api/use-gift/${code}`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ code }),
   });
 
-  const data = await res.json();
-
-  if (!res.ok || !data.ok) {
-    throw new Error(data.error || "Код уже использован или недействителен");
+  if (!res.ok) {
+    throw new Error("USE_FAILED");
   }
 
-  return data;
+  return await res.json();
 }

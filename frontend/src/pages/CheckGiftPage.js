@@ -1,18 +1,31 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { getGift } from "../api";
+import { getGift, useGift } from "../api";
 import "./CheckGiftPage.css";
 
+// 📥 гарантированное скачивание файла
+async function downloadGift(url) {
+  const res = await fetch(url);
+  const blob = await res.blob();
 
-function CheckGiftPage() {
-   const [code, setCode] = useState("");    
-   const [usedCode, setUsedCode] = useState(""); // ← ВАЖНО
-   const [giftUrl, setGiftUrl] = useState(null);
-   const [message, setMessage] = useState("");
-   const [opening, setOpening] = useState(false);
-   const [checking, setChecking] = useState(false);
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = blobUrl;
+  a.download = "gift.png";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(blobUrl);
+}
 
-  const handleCheck = async () => {
+export default function CheckGiftPage() {
+  const [code, setCode] = useState("");
+  const [giftUrl, setGiftUrl] = useState(null);
+  const [message, setMessage] = useState("");
+  const [opening, setOpening] = useState(false);
+  const [checking, setChecking] = useState(false);
+
+  async function handleCheck() {
     if (checking || !code.trim()) return;
 
     setChecking(true);
@@ -21,37 +34,31 @@ function CheckGiftPage() {
     setOpening(false);
 
     try {
-const res = await getGift(code.trim().toUpperCase());
+      const res = await getGift(code.trim().toUpperCase());
 
-if (res?.gift?.file_url) {
-  setGiftUrl(res.gift.file_url);
-  setMessage("🎉 Код верный! Нажмите на подарок 🎁");
-} else {
-  setMessage("❌ Неверный или уже использованный код");
-}
+      if (res?.gift?.file_url && !res.gift.is_used) {
+        setGiftUrl(res.gift.file_url);
+        setMessage("🎉 Код верный! Нажмите на подарок 🎁");
+      } else {
+        setMessage("❌ Код уже использован");
+      }
     } catch {
       setMessage("❌ Неверный или уже использованный код");
     } finally {
       setChecking(false);
     }
-  };
+  }
 
-const handleGiftClick = async () => {
-  if (!giftUrl || opening) return;
+  async function handleGiftClick() {
+    if (!giftUrl || opening) return;
 
-  setOpening(true);
+    setOpening(true);
 
-  // ✅ 1. СНАЧАЛА помечаем код использованным
-  await fetch(
-    `${process.env.REACT_APP_API_URL}/api/use-gift/${code}`,
-    { method: "POST" }
-  );
-
-  // ✅ 2. Потом просто открываем файл
-  setTimeout(() => {
-    window.location.href = giftUrl;
-  }, 1200);
-};
+    setTimeout(async () => {
+      await downloadGift(giftUrl);
+      await useGift(code.trim().toUpperCase());
+    }, 1200);
+  }
 
   return (
     <div className="check-page">
@@ -97,5 +104,3 @@ const handleGiftClick = async () => {
     </div>
   );
 }
-
-export default CheckGiftPage;
