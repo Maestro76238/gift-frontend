@@ -10,7 +10,8 @@ export async function getGift(code) {
   return await res.json();
 }
 
-export async function useGift(code) {
+// ❗️ НЕ useGift — чтобы eslint не думал, что это хук
+export async function markGiftUsed(code) {
   const res = await fetch(`${API_URL}/api/use-gift/${code}`, {
     method: "POST",
   });
