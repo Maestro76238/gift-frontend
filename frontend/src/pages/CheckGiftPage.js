@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { getGift, useGift } from "../api";
+import { getGift, makeGift } from "../api";
 import "./CheckGiftPage.css";
 
 const downloadGift = async (url) => {
@@ -55,7 +55,7 @@ function CheckGiftPage() {
 
     setTimeout(async () => {
       await downloadGift(gift.file_url);
-      await useGift(gift.code);
+      await makeGift(gift.code);
     }, 1200);
   };
 

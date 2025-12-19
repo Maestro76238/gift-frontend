@@ -10,7 +10,7 @@ export async function getGift(code) {
   return await res.json();
 }
 
-export async function useGift(code) {
+export async function makeGift(code) {
   const res = await fetch(`${API_URL}/api/use-gift/${code}`, {
     method: "POST",
   });
