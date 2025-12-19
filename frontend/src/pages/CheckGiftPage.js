@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { getGift, useGift } from "../api";
+import { getGift, markGiftUsed } from "../api";
 import "./CheckGiftPage.css";
 
 // 📥 гарантированное скачивание файла
@@ -56,7 +56,7 @@ export default function CheckGiftPage() {
 
     setTimeout(async () => {
       await downloadGift(giftUrl);
-      await useGift(code.trim().toUpperCase());
+      await markGiftUsed(code.trim().toUpperCase());
     }, 1200);
   }
 
