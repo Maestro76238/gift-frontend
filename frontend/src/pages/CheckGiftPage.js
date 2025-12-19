@@ -1,106 +1,103 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { getGift, markGiftUsed } from "../api";
-import "./CheckGiftPage.css";
-
-// 📥 гарантированное скачивание файла
-async function downloadGift(url) {
-  const res = await fetch(url);
-  const blob = await res.blob();
-
-  const blobUrl = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = blobUrl;
-  a.download = "gift.png";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(blobUrl);
-}
+import { checkGift, useGift } from "../api";
 
 export default function CheckGiftPage() {
   const [code, setCode] = useState("");
-  const [giftUrl, setGiftUrl] = useState(null);
-  const [message, setMessage] = useState("");
-  const [opening, setOpening] = useState(false);
-  const [checking, setChecking] = useState(false);
+  const [gift, setGift] = useState(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  async function handleCheck() {
-    if (checking || !code.trim()) return;
-
-    setChecking(true);
-    setMessage("");
-    setGiftUrl(null);
-    setOpening(false);
+  const handleCheck = async () => {
+    setError("");
+    setGift(null);
+    setLoading(true);
 
     try {
-      const res = await getGift(code.trim().toUpperCase());
+      const result = await checkGift(code.trim());
 
-      if (res?.gift?.file_url && !res.gift.is_used) {
-        setGiftUrl(res.gift.file_url);
-        setMessage("🎉 Код верный! Нажмите на подарок 🎁");
-      } else {
-        setMessage("❌ Код уже использован");
+      // 🔴 ВАЖНО: проверяем result.ok, а НЕ response.ok
+      if (!result.ok) {
+        setError("Неверный или уже использованный код");
+        return;
       }
-    } catch {
-      setMessage("❌ Неверный или уже использованный код");
+
+      setGift(result.gift);
+    } catch (e) {
+      setError("Ошибка сервера");
     } finally {
-      setChecking(false);
+      setLoading(false);
     }
-  }
+  };
 
-  async function handleGiftClick() {
-    if (!giftUrl || opening) return;
+  const handleUse = async () => {
+    setError("");
+    setLoading(true);
 
-    setOpening(true);
+    try {
+      const result = await useGift(code.trim());
 
-    setTimeout(async () => {
-      await downloadGift(giftUrl);
-      await markGiftUsed(code.trim().toUpperCase());
-    }, 1200);
-  }
+      if (!result.ok) {
+        setError("Код уже использован");
+        return;
+      }
+
+      // после использования можно скрыть кнопку
+      setGift((prev) => ({
+        ...prev,
+        is_used: true,
+      }));
+    } catch (e) {
+      setError("Ошибка сервера");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="check-page">
-      <motion.div
-        className={`gift ${giftUrl ? "active" : ""}`}
-        onClick={handleGiftClick}
-        animate={
-          giftUrl
-            ? opening
-              ? {
-                  scale: [1, 1.3, 0.6],
-                  rotate: [0, 10, -10, 0],
-                  opacity: [1, 1, 0],
-                }
-              : { scale: [1, 1.08, 1] }
-            : {}
-        }
-        transition={
-          opening
-            ? { duration: 1.2, ease: "easeInOut" }
-            : giftUrl
-            ? { duration: 1.4, repeat: Infinity }
-            : {}
-        }
-      >
-        🎁
-      </motion.div>
+    <div style={{ maxWidth: 400, margin: "40px auto", textAlign: "center" }}>
+      <h2>🎁 Проверка кода</h2>
 
-      {!giftUrl && (
-        <div className="code-box">
-          <input
-            placeholder="Введите секретный код"
-            value={code}
-            onChange={(e) => setCode(e.target.value.toUpperCase())}
+      <input
+        type="text"
+        placeholder="Введите код"
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+        style={{ width: "100%", padding: 10, marginBottom: 10 }}
+      />
+
+      <button onClick={handleCheck} disabled={loading}>
+        Проверить
+      </button>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {gift && (
+        <div style={{ marginTop: 20 }}>
+          <p>🎉 Ваш подарок:</p>
+
+          <img
+            src={gift.file_url}
+            alt="gift"
+            style={{ width: "100%", borderRadius: 10 }}
           />
-          <button onClick={handleCheck} disabled={checking}>
-            {checking ? "Проверка..." : "Проверить код"}
-          </button>
+
+          {!gift.is_used && (
+            <button
+              onClick={handleUse}
+              style={{ marginTop: 10 }}
+              disabled={loading}
+            >
+              Забрать подарок
+            </button>
+          )}
+
+          {gift.is_used && (
+            <p style={{ color: "green", marginTop: 10 }}>
+              ✅ Подарок получен
+            </p>
+          )}
         </div>
       )}
-
-      {message && <div className="hint">{message}</div>}
     </div>
   );
 }
