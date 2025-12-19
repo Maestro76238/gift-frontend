@@ -1,25 +1,26 @@
-const API_URL = process.env.REACT_APP_API_URL || "";
+const API_URL = process.env.REACT_APP_API_URL;
 
 export async function checkGift(code) {
-  const res = await fetch(`${API_URL}/check-gift`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ code }),
-  });
+  const res = await fetch(`${API_URL}/api/check-gift/${code}`);
+  const data = await res.json();
 
-  return await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || "Invalid code");
+  }
+
+  return data;
 }
 
-export async function useGift(code) {
-  const res = await fetch(`${API_URL}/use-gift`, {
+export async function markGiftUsed(code) {
+  const res = await fetch(`${API_URL}/api/use-gift/${code}`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ code }),
   });
 
-  return await res.json();
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Use failed");
+  }
+
+  return data;
 }

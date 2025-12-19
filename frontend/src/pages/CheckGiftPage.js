@@ -1,85 +1,77 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { getGift, markGiftUsed } from "../api";
+import { checkGift, markGiftUsed } from "../api";
 import "./CheckGiftPage.css";
 
-// 📥 гарантированное скачивание файла
-async function downloadGift(url) {
+async function downloadFile(url) {
   const res = await fetch(url);
   const blob = await res.blob();
 
-  const blobUrl = URL.createObjectURL(blob);
+  const blobUrl = window.URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = blobUrl;
-  a.download = "gift.png";
+  a.download = "gift";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(blobUrl);
+  window.URL.revokeObjectURL(blobUrl);
 }
 
-export default function CheckGiftPage() {
+function CheckGiftPage() {
   const [code, setCode] = useState("");
-  const [giftUrl, setGiftUrl] = useState(null);
+  const [gift, setGift] = useState(null);
   const [message, setMessage] = useState("");
-  const [opening, setOpening] = useState(false);
   const [checking, setChecking] = useState(false);
+  const [opening, setOpening] = useState(false);
 
-  async function handleCheck() {
-    if (checking || !code.trim()) return;
+  const handleCheck = async () => {
+    if (!code.trim() || checking) return;
 
     setChecking(true);
+    setGift(null);
     setMessage("");
-    setGiftUrl(null);
-    setOpening(false);
 
     try {
-      const res = await getGift(code.trim().toUpperCase());
+      const res = await checkGift(code.trim().toUpperCase());
 
-      if (res?.gift?.file_url && !res.gift.is_used) {
-        setGiftUrl(res.gift.file_url);
-        setMessage("🎉 Код верный! Нажмите на подарок 🎁");
-      } else {
-        setMessage("❌ Код уже использован");
-      }
+      setGift(res.gift);
+      setMessage("🎉 Код верный! Нажмите на подарок 🎁");
     } catch {
       setMessage("❌ Неверный или уже использованный код");
     } finally {
       setChecking(false);
     }
-  }
+  };
 
-  async function handleGiftClick() {
-    if (!giftUrl || opening) return;
+  const handleOpenGift = async () => {
+    if (!gift || opening) return;
 
     setOpening(true);
 
-    setTimeout(async () => {
-      await downloadGift(giftUrl);
-      await markGiftUsed(code.trim().toUpperCase());
-    }, 1200);
-  }
+    try {
+      await downloadFile(gift.file_url);
+      await markGiftUsed(gift.code); // ✅ ТОЛЬКО ЗДЕСЬ
+    } catch (e) {
+      console.error("OPEN ERROR:", e);
+    }
+  };
 
   return (
     <div className="check-page">
       <motion.div
-        className={`gift ${giftUrl ? "active" : ""}`}
-        onClick={handleGiftClick}
+        className={`gift ${gift ? "active" : ""}`}
+        onClick={handleOpenGift}
         animate={
-          giftUrl
+          gift
             ? opening
-              ? {
-                  scale: [1, 1.3, 0.6],
-                  rotate: [0, 10, -10, 0],
-                  opacity: [1, 1, 0],
-                }
+              ? { scale: [1, 1.3, 0.6], opacity: [1, 1, 0] }
               : { scale: [1, 1.08, 1] }
             : {}
         }
         transition={
           opening
-            ? { duration: 1.2, ease: "easeInOut" }
-            : giftUrl
+            ? { duration: 1.2 }
+            : gift
             ? { duration: 1.4, repeat: Infinity }
             : {}
         }
@@ -87,7 +79,7 @@ export default function CheckGiftPage() {
         🎁
       </motion.div>
 
-      {!giftUrl && (
+      {!gift && (
         <div className="code-box">
           <input
             placeholder="Введите секретный код"
@@ -104,3 +96,5 @@ export default function CheckGiftPage() {
     </div>
   );
 }
+
+export default CheckGiftPage;
